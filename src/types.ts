@@ -6,6 +6,8 @@ export type MemoryCategory =
   | 'task'
   | string; // Allow custom categories
 
+export type MemoryPriority = 'high' | 'normal' | 'low';
+
 export interface MemoryMetadata {
   id: string;
   category: MemoryCategory;
@@ -13,6 +15,11 @@ export interface MemoryMetadata {
   title: string;
   created: string; // ISO date string
   updated: string; // ISO date string
+  projectId?: string;   // Git remote URL (normalized) or null for global
+  projectName?: string; // Human-readable project name
+  priority?: MemoryPriority; // Memory importance (default: normal)
+  expiresAt?: string;   // ISO date string - memory auto-expires after this date
+  relatedTo?: string[]; // IDs of related memories
 }
 
 export interface Memory extends MemoryMetadata {
@@ -28,6 +35,11 @@ export interface MemoryIndexEntry {
   created: string;
   updated: string;
   snippet: string; // First ~100 chars of content for search
+  projectId?: string;   // Git remote URL (normalized) or null for global
+  projectName?: string; // Human-readable project name
+  priority?: MemoryPriority; // Memory importance (default: normal)
+  expiresAt?: string;   // ISO date string - memory auto-expires after this date
+  relatedTo?: string[]; // IDs of related memories
 }
 
 export interface MemoryIndex {
