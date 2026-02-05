@@ -31,51 +31,30 @@ $installInstructions = @"
 - Node.js 18 or higher
 - OneDrive client installed and syncing
 
-## Installation
+## One-Line Install
 
-1. Open PowerShell or Command Prompt in this folder
-2. Run:
-   ``````
-   npm install -g ./odsp-memory-skill-1.0.0.tgz
-   ``````
+Open PowerShell in this folder and run:
 
-## Setup
+``````powershell
+powershell -ExecutionPolicy Bypass -File install.ps1
+``````
 
-1. Verify OneDrive detection:
-   ``````
-   odsp-memory status
-   ``````
+That's it! The script installs the tool and configures Claude Code automatically.
 
-2. If you have multiple OneDrive accounts, select the right one:
-   ``````
-   odsp-memory config list
-   odsp-memory config set <number>
-   ``````
+## Manual Installation (if needed)
 
-3. Test it works:
-   ``````
-   odsp-memory remember project "Test memory"
-   odsp-memory list
-   ``````
+``````powershell
+npm install -g ./odsp-memory-skill-1.0.0.tgz
+odsp-memory setup
+``````
 
-## Add to Claude Code
+## Multiple OneDrive Accounts
 
-Add this to your Claude Code project's CLAUDE.md file or settings:
+If you have multiple OneDrive accounts, select the right one after install:
 
-``````markdown
-## Memory Skill
-
-I have access to persistent memory via OneDrive. Use these commands:
-
-- ``odsp-memory remember <category> <content>`` - Store a memory
-- ``odsp-memory recall [query]`` - Search memories
-- ``odsp-memory list [category]`` - List all memories
-- ``odsp-memory forget <id>`` - Delete a memory
-
-Categories: project, decision, preference, learning, task
-
-Proactively remember important context about projects, decisions, and user preferences.
-At the start of sessions, recall relevant context with: ``odsp-memory recall --category=project``
+``````powershell
+odsp-memory config list
+odsp-memory config set <number>
 ``````
 
 ## Commands Reference
@@ -108,14 +87,49 @@ At the start of sessions, recall relevant context with: ``odsp-memory recall --c
 
 $installInstructions | Out-File -FilePath "$distFolder/INSTALL.md" -Encoding UTF8
 
+# Create one-liner install script
+$installScript = @'
+# OneDrive Memory Skill - One-Line Installer
+# Run this script in PowerShell from the folder containing the .tgz file
+
+$ErrorActionPreference = "Stop"
+
+Write-Host "Installing OneDrive Memory Skill..." -ForegroundColor Cyan
+
+# Find the package file
+$packageFile = Get-ChildItem -Filter "odsp-memory-skill-*.tgz" | Select-Object -First 1
+if (-not $packageFile) {
+    Write-Host "Error: Package file (odsp-memory-skill-*.tgz) not found in current directory." -ForegroundColor Red
+    Write-Host "Make sure you're running this from the folder containing the .tgz file." -ForegroundColor Yellow
+    exit 1
+}
+
+Write-Host "  - Installing $($packageFile.Name)..."
+npm install -g "./$($packageFile.Name)"
+if ($LASTEXITCODE -ne 0) {
+    Write-Host "Error: npm install failed." -ForegroundColor Red
+    exit 1
+}
+
+Write-Host "  - Configuring Claude Code..."
+odsp-memory setup
+
+Write-Host ""
+Write-Host "Installation complete!" -ForegroundColor Green
+Write-Host ""
+Write-Host "You can now use memory commands in Claude Code." -ForegroundColor Cyan
+Write-Host "Claude will automatically remember and recall context across sessions."
+Write-Host ""
+'@
+
+$installScript | Out-File -FilePath "$distFolder/install.ps1" -Encoding UTF8
+
 Write-Host ""
 Write-Host "Done! Distribution package created in: $distFolder/" -ForegroundColor Green
 Write-Host ""
 Write-Host "Share these files via Teams:" -ForegroundColor Yellow
 Get-ChildItem $distFolder | ForEach-Object { Write-Host "  - $($_.Name)" }
 Write-Host ""
-Write-Host "Teammates should:" -ForegroundColor Yellow
-Write-Host "  1. Download both files to the same folder"
-Write-Host "  2. Open PowerShell in that folder"
-Write-Host "  3. Run: npm install -g ./odsp-memory-skill-1.0.0.tgz"
+Write-Host "Teammates run ONE command:" -ForegroundColor Yellow
+Write-Host "  powershell -ExecutionPolicy Bypass -File install.ps1" -ForegroundColor White
 Write-Host ""

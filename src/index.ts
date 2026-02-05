@@ -298,6 +298,78 @@ function handleConfig(args: string[]): CommandResult {
   };
 }
 
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs';
+import { homedir } from 'os';
+import { join } from 'path';
+
+const CLAUDE_INSTRUCTIONS = `## Memory Skill
+
+I have access to persistent memory via OneDrive. Use these commands in Bash:
+
+- \`odsp-memory remember <category> <content>\` - Store a memory
+- \`odsp-memory recall [query]\` - Search memories
+- \`odsp-memory list [category]\` - List all memories
+- \`odsp-memory forget <id>\` - Delete a memory
+
+**Categories:** project, decision, preference, learning, task
+
+**Best practices:**
+- Proactively remember important context about projects, decisions, and user preferences
+- At the start of sessions, recall relevant context: \`odsp-memory recall --category=project\`
+- When users make decisions, store them: \`odsp-memory remember decision "Chose X because Y"\`
+`;
+
+function handleSetup(): CommandResult {
+  // Check OneDrive first
+  const oneDriveFolder = findOneDriveFolder();
+  if (!oneDriveFolder) {
+    return {
+      success: false,
+      message: 'Error: OneDrive folder not found.\nMake sure OneDrive is installed and syncing first.',
+    };
+  }
+
+  // Find or create Claude config directory
+  const claudeDir = join(homedir(), '.claude');
+  const claudeMdPath = join(claudeDir, 'CLAUDE.md');
+
+  try {
+    // Create .claude directory if needed
+    if (!existsSync(claudeDir)) {
+      mkdirSync(claudeDir, { recursive: true });
+    }
+
+    // Check if CLAUDE.md exists and already has our instructions
+    let existingContent = '';
+    if (existsSync(claudeMdPath)) {
+      existingContent = readFileSync(claudeMdPath, 'utf-8');
+      if (existingContent.includes('odsp-memory')) {
+        return {
+          success: true,
+          message: `Claude is already configured!\n\nOneDrive folder: ${oneDriveFolder}\nClaude config: ${claudeMdPath}\n\nTest it with: odsp-memory remember project "Test memory"`,
+        };
+      }
+    }
+
+    // Append our instructions
+    const newContent = existingContent
+      ? existingContent.trimEnd() + '\n\n' + CLAUDE_INSTRUCTIONS
+      : CLAUDE_INSTRUCTIONS;
+
+    writeFileSync(claudeMdPath, newContent, 'utf-8');
+
+    return {
+      success: true,
+      message: `Setup complete!\n\nOneDrive folder: ${oneDriveFolder}\nClaude config: ${claudeMdPath}\n\nClaude Code now knows about the memory skill.\nTest it by asking Claude to "remember that this is a test project".`,
+    };
+  } catch (error) {
+    return {
+      success: false,
+      message: `Failed to configure Claude: ${error instanceof Error ? error.message : 'Unknown error'}\n\nYou can manually add these instructions to ${claudeMdPath}:\n\n${CLAUDE_INSTRUCTIONS}`,
+    };
+  }
+}
+
 function handleHelp(): CommandResult {
   const help = `
 OneDrive Memory Skill for Claude Code
@@ -321,6 +393,8 @@ COMMANDS:
   config list                     List available OneDrive folders
   config set <number>             Select which OneDrive folder to use
   config reset                    Reset to auto-detection
+
+  setup                           Configure Claude Code to use this skill
 
   help                            Show this help message
 
@@ -387,6 +461,13 @@ async function main(): Promise<void> {
   if (command === 'status') {
     const config = loadConfig();
     const result = handleStatus(config);
+    console.log(result.message);
+    process.exit(result.success ? 0 : 1);
+  }
+
+  // Setup command configures Claude Code
+  if (command === 'setup') {
+    const result = handleSetup();
     console.log(result.message);
     process.exit(result.success ? 0 : 1);
   }
