@@ -332,6 +332,7 @@ function handleSetup(): CommandResult {
   // Find or create Claude config directory
   const claudeDir = join(homedir(), '.claude');
   const claudeMdPath = join(claudeDir, 'CLAUDE.md');
+  const settingsPath = join(claudeDir, 'settings.json');
 
   try {
     // Create .claude directory if needed
@@ -339,28 +340,85 @@ function handleSetup(): CommandResult {
       mkdirSync(claudeDir, { recursive: true });
     }
 
-    // Check if CLAUDE.md exists and already has our instructions
-    let existingContent = '';
+    let alreadyConfigured = false;
+
+    // Configure CLAUDE.md with instructions
+    let existingMdContent = '';
     if (existsSync(claudeMdPath)) {
-      existingContent = readFileSync(claudeMdPath, 'utf-8');
-      if (existingContent.includes('odsp-memory')) {
-        return {
-          success: true,
-          message: `Claude is already configured!\n\nOneDrive folder: ${oneDriveFolder}\nClaude config: ${claudeMdPath}\n\nTest it with: odsp-memory remember project "Test memory"`,
-        };
+      existingMdContent = readFileSync(claudeMdPath, 'utf-8');
+      if (existingMdContent.includes('odsp-memory')) {
+        alreadyConfigured = true;
       }
     }
 
-    // Append our instructions
-    const newContent = existingContent
-      ? existingContent.trimEnd() + '\n\n' + CLAUDE_INSTRUCTIONS
-      : CLAUDE_INSTRUCTIONS;
+    if (!alreadyConfigured) {
+      const newMdContent = existingMdContent
+        ? existingMdContent.trimEnd() + '\n\n' + CLAUDE_INSTRUCTIONS
+        : CLAUDE_INSTRUCTIONS;
+      writeFileSync(claudeMdPath, newMdContent, 'utf-8');
+    }
 
-    writeFileSync(claudeMdPath, newContent, 'utf-8');
+    // Configure settings.json with hooks and permissions
+    let settings: Record<string, unknown> = {};
+    if (existsSync(settingsPath)) {
+      try {
+        settings = JSON.parse(readFileSync(settingsPath, 'utf-8'));
+      } catch {
+        // If JSON is invalid, start fresh
+        settings = {};
+      }
+    }
+
+    // Add permission for odsp-memory commands
+    if (!settings.permissions) {
+      settings.permissions = { allow: [] };
+    }
+    const permissions = settings.permissions as { allow: string[] };
+    if (!permissions.allow) {
+      permissions.allow = [];
+    }
+    if (!permissions.allow.includes('Bash(odsp-memory:*)')) {
+      permissions.allow.push('Bash(odsp-memory:*)');
+    }
+
+    // Add SessionStart hook for auto-recall
+    if (!settings.hooks) {
+      settings.hooks = {};
+    }
+    const hooks = settings.hooks as Record<string, unknown>;
+
+    // Check if SessionStart hook already has odsp-memory
+    const existingSessionStart = hooks.SessionStart as Array<{ hooks?: Array<{ command?: string }> }> | undefined;
+    const hasMemoryHook = existingSessionStart?.some(h =>
+      h.hooks?.some(hook => hook.command?.includes('odsp-memory'))
+    );
+
+    if (!hasMemoryHook) {
+      hooks.SessionStart = [
+        ...(existingSessionStart || []),
+        {
+          hooks: [
+            {
+              type: 'command',
+              command: 'odsp-memory recall --limit=5'
+            }
+          ]
+        }
+      ];
+    }
+
+    writeFileSync(settingsPath, JSON.stringify(settings, null, 2), 'utf-8');
+
+    if (alreadyConfigured) {
+      return {
+        success: true,
+        message: `Claude is already configured!\n\nOneDrive folder: ${oneDriveFolder}\nClaude config: ${claudeMdPath}\nSettings: ${settingsPath}\n\nTest it with: odsp-memory remember project "Test memory"`,
+      };
+    }
 
     return {
       success: true,
-      message: `Setup complete!\n\nOneDrive folder: ${oneDriveFolder}\nClaude config: ${claudeMdPath}\n\nClaude Code now knows about the memory skill.\nTest it by asking Claude to "remember that this is a test project".`,
+      message: `Setup complete!\n\nOneDrive folder: ${oneDriveFolder}\nClaude config: ${claudeMdPath}\nSettings: ${settingsPath}\n\nClaude Code will now:\n- Auto-recall memories at session start\n- Use memory commands without prompts\n\nTest it by asking Claude to "remember that this is a test project".`,
     };
   } catch (error) {
     return {

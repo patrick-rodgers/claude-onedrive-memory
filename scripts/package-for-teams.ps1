@@ -25,10 +25,12 @@ npm pack --pack-destination "$distFolder" 2>&1 | Out-Null
 
 # Create install instructions
 $installInstructions = @"
-# OneDrive Memory Skill - Quick Install
+# OneDrive Memory Skill for Claude Code
+
+Gives Claude persistent memory across sessions using your OneDrive.
 
 ## Prerequisites
-- Node.js 18 or higher
+- Node.js 18 or higher (check with ``node --version``)
 - OneDrive client installed and syncing
 
 ## One-Line Install
@@ -39,7 +41,16 @@ Open PowerShell in this folder and run:
 powershell -ExecutionPolicy Bypass -File install.ps1
 ``````
 
-That's it! The script installs the tool and configures Claude Code automatically.
+That's it! The script:
+1. Installs the ``odsp-memory`` command globally
+2. Configures Claude Code to auto-recall memories at session start
+3. Adds permissions so memory commands run without prompts
+
+## What Happens After Install
+
+- **Auto-recall**: Claude automatically retrieves recent memories when you start a session
+- **No prompts**: Memory commands run without asking for permission
+- **Proactive memory**: Claude will remember important context about projects and decisions
 
 ## Manual Installation (if needed)
 
