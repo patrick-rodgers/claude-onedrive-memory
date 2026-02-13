@@ -1,6 +1,6 @@
 {
   "name": "odsp-memory-skill",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Claude Code skill for persistent memory using OneDrive local sync",
   "type": "module",
   "main": "dist/index.js",
