@@ -13,37 +13,66 @@ This skill writes memory files directly to your local OneDrive folder. The OneDr
 
 ## Quick Start
 
-### 1. Prerequisites
+### Prerequisites
 
-- Node.js 18+
+- Node.js 18+ ([Download](https://nodejs.org/))
 - OneDrive client installed and syncing (Windows, macOS, or Linux)
 
-### 2. Install
+### One-Command Installation
 
-```bash
-npm install
-npm run build
+**Windows (PowerShell):**
+```powershell
+iwr -useb https://raw.githubusercontent.com/patrick-rodgers/claude-onedrive-memory/main/install.ps1 | iex
 ```
 
-### 3. Verify Setup
-
+**macOS/Linux (Bash):**
 ```bash
-node dist/index.js status
+curl -fsSL https://raw.githubusercontent.com/patrick-rodgers/claude-onedrive-memory/main/install.sh | bash
 ```
 
-This should show your detected OneDrive folder location.
+That's it! The installer will:
+1. ✅ Download the latest release
+2. ✅ Install the `odsp-memory` command globally
+3. ✅ Configure Claude Code for auto-recall
+4. ✅ Set up permissions for seamless operation
 
-### 4. Start Using
+### Verify Installation
+
+```bash
+odsp-memory status
+```
+
+### Start Using in Claude Code
+
+Claude will now automatically:
+- **Auto-recall** relevant memories when you start sessions
+- **Proactively remember** important context about your projects
+- **Sync memories** across all devices via OneDrive
+
+You can also use the commands directly:
 
 ```bash
 # Store a memory
-node dist/index.js remember project "This codebase uses React 18 with TypeScript"
+odsp-memory remember project "This codebase uses React 18 with TypeScript"
 
 # List memories
-node dist/index.js list
+odsp-memory list
 
 # Search memories
-node dist/index.js recall "React"
+odsp-memory recall "React"
+```
+
+### Manual Installation (Alternative)
+
+If you prefer to install manually or contribute to development:
+
+```bash
+git clone https://github.com/patrick-rodgers/claude-onedrive-memory.git
+cd claude-onedrive-memory
+npm install
+npm run build
+npm install -g .
+odsp-memory setup
 ```
 
 ## OneDrive Detection
@@ -295,7 +324,17 @@ This codebase uses React 18 with TypeScript...
 
 ## Claude Code Integration
 
-The `skill.md` file contains instructions for Claude on when and how to use memory proactively. Add this skill to your Claude Code configuration to enable automatic memory management.
+**Automatic Setup:** The installation script automatically configures Claude Code to:
+- Load memory instructions via the `skill.md` file
+- Auto-recall relevant memories when starting new sessions
+- Allow memory commands to run without permission prompts
+
+The integration teaches Claude:
+- When to proactively remember information (projects, decisions, preferences)
+- How to search and recall memories intelligently
+- Best practices for memory management across sessions
+
+No manual configuration needed! Just install and start chatting with Claude.
 
 ## Troubleshooting
 
