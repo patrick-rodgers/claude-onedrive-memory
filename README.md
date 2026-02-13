@@ -364,3 +364,7 @@ The skill prioritizes work/school accounts over personal accounts. If you need t
 ## License
 
 MIT
+
+## Warranty Disclaimer
+
+This software is provided “AS IS”, without warranty of any kind, express or implied, including but not limited to the warranties of merchantability, fitness for a particular purpose, and noninfringement. In no event shall the authors or copyright holders be liable for any claim, damages, or other liability, whether in an action of contract, tort, or otherwise, arising from, out of, or in connection with the software or the use or other dealings in the software.
