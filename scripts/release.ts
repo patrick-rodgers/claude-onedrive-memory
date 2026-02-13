@@ -2,10 +2,11 @@
 /**
  * Release script for odsp-memory-skill
  * Usage:
- *   npm run release patch   # 0.0.1 -> 0.0.2
- *   npm run release minor   # 0.0.1 -> 0.1.0
- *   npm run release major   # 0.0.1 -> 1.0.0
- *   npm run release 0.0.1   # Set specific version
+ *   npm run release patch          # 0.0.1 -> 0.0.2
+ *   npm run release minor          # 0.0.1 -> 0.1.0
+ *   npm run release major          # 0.0.1 -> 1.0.0
+ *   npm run release 0.0.1          # Set specific version
+ *   npm run release patch --dry-run # Test locally without pushing
  */
 
 import { execSync } from 'child_process';
@@ -18,8 +19,14 @@ const __dirname = dirname(__filename);
 const ROOT_DIR = join(__dirname, '..');
 const PACKAGE_JSON_PATH = join(ROOT_DIR, 'package.json');
 
+let DRY_RUN = false;
+
 function exec(command: string, options = {}) {
   console.log(`\n→ ${command}`);
+  if (DRY_RUN) {
+    console.log('  (skipped in dry-run mode)');
+    return Buffer.from('');
+  }
   return execSync(command, {
     stdio: 'inherit',
     cwd: ROOT_DIR,
@@ -83,15 +90,18 @@ function getReleaseNotes(oldVersion: string, newVersion: string): string {
 }
 
 async function main() {
-  const arg = process.argv[2];
+  const args = process.argv.slice(2);
+  const arg = args[0];
+  DRY_RUN = args.includes('--dry-run');
 
-  if (!arg) {
-    console.error('Usage: npm run release <patch|minor|major|version>');
+  if (!arg || arg === '--dry-run') {
+    console.error('Usage: npm run release <patch|minor|major|version> [--dry-run]');
     console.error('Examples:');
-    console.error('  npm run release patch   # Bump patch version');
-    console.error('  npm run release minor   # Bump minor version');
-    console.error('  npm run release major   # Bump major version');
-    console.error('  npm run release 0.0.1   # Set specific version');
+    console.error('  npm run release patch          # Bump patch version');
+    console.error('  npm run release minor          # Bump minor version');
+    console.error('  npm run release major          # Bump major version');
+    console.error('  npm run release 0.0.1          # Set specific version');
+    console.error('  npm run release patch --dry-run # Test locally without pushing');
     process.exit(1);
   }
 
@@ -109,22 +119,45 @@ async function main() {
     newVersion = arg;
   }
 
-  console.log(`\n📦 Releasing odsp-memory-skill`);
+  console.log(`\n📦 Releasing odsp-memory-skill ${DRY_RUN ? '(DRY RUN)' : ''}`);
   console.log(`   Current version: ${currentVersion}`);
   console.log(`   New version:     ${newVersion}`);
+  if (DRY_RUN) {
+    console.log(`   Mode:            🧪 Dry run (no git push or GitHub release)`);
+  }
   console.log('');
 
   // Step 1: Update version in package.json
   console.log('1️⃣  Updating package.json...');
-  updatePackageVersion(newVersion);
+  const oldVersion = updatePackageVersion(newVersion);
 
   // Step 2: Build
   console.log('\n2️⃣  Building...');
-  exec('npm run build');
+  execSync('npm run build', { stdio: 'inherit', cwd: ROOT_DIR });
 
   // Step 3: Package for distribution
   console.log('\n3️⃣  Creating distribution package...');
-  exec('npm run package');
+  execSync('npm run package', { stdio: 'inherit', cwd: ROOT_DIR });
+
+  if (DRY_RUN) {
+    // In dry-run mode, restore the original version
+    console.log('\n4️⃣  Restoring original version (dry-run mode)...');
+    updatePackageVersion(currentVersion);
+
+    console.log('\n✅ Dry run complete!');
+    console.log(`\n🧪 Dry run results:`);
+    console.log(`   ✓ Version bump works: ${currentVersion} → ${newVersion}`);
+    console.log(`   ✓ Build successful`);
+    console.log(`   ✓ Package creation successful`);
+    console.log(`   ✓ Distribution files ready in teams-distribution/`);
+    console.log('\nSkipped in dry-run mode:');
+    console.log('   - Git commit');
+    console.log('   - Git tag creation');
+    console.log('   - Push to remote');
+    console.log('   - GitHub release creation');
+    console.log('\nTo perform a real release, run without --dry-run flag.');
+    return;
+  }
 
   // Step 4: Commit version bump
   console.log('\n4️⃣  Committing version bump...');
