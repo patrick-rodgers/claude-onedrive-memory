@@ -12,7 +12,7 @@ Write-Host ""
 
 # Configuration
 $REPO = "patrick-rodgers/claude-onedrive-memory"
-$GITHUB_API = "https://api.github.com/repos/$REPO/releases/latest"
+$GITHUB_API = "https://api.github.com/repos/$REPO/releases/latest"  # Always fetches the latest release
 
 # Check prerequisites
 Write-Host "[1/5] Checking prerequisites..." -ForegroundColor Yellow

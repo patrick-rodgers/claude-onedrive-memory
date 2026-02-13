@@ -30,8 +30,10 @@ iwr -useb https://raw.githubusercontent.com/patrick-rodgers/claude-onedrive-memo
 curl -fsSL https://raw.githubusercontent.com/patrick-rodgers/claude-onedrive-memory/main/install.sh | bash
 ```
 
+> 💡 **Always up-to-date:** The installer automatically downloads the latest release from GitHub. No version numbers to remember!
+
 That's it! The installer will:
-1. ✅ Download the latest release
+1. ✅ Download the **latest release** automatically
 2. ✅ Install the `odsp-memory` command globally
 3. ✅ Configure Claude Code for auto-recall
 4. ✅ Set up permissions for seamless operation

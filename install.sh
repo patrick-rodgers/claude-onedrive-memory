@@ -14,7 +14,7 @@ NC='\033[0m' # No Color
 
 # Configuration
 REPO="patrick-rodgers/claude-onedrive-memory"
-GITHUB_API="https://api.github.com/repos/$REPO/releases/latest"
+GITHUB_API="https://api.github.com/repos/$REPO/releases/latest"  # Always fetches the latest release
 
 echo ""
 echo -e "${CYAN}========================================"

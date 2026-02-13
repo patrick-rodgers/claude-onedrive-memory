@@ -65,11 +65,13 @@ curl -fsSL https://raw.githubusercontent.com/patrick-rodgers/claude-onedrive-mem
 ## What Users Get
 
 When users run the one-line install command:
-1. ✅ Latest version downloaded automatically from GitHub releases
+1. ✅ **Latest version** downloaded automatically from GitHub releases API (`/releases/latest`)
 2. ✅ `odsp-memory` command installed globally
 3. ✅ Claude Code configured automatically (skill.md + hooks)
 4. ✅ Memory commands work without permission prompts
 5. ✅ Auto-recall enabled for new Claude sessions
+
+**Note:** The installer always fetches the latest release, so users automatically get updates by re-running the install command.
 
 ## User Installation
 
