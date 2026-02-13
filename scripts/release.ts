@@ -161,7 +161,7 @@ async function main() {
 
   // Step 4: Commit version bump
   console.log('\n4️⃣  Committing version bump...');
-  exec('git add package.json');
+  exec('git add package.json package-lock.json');
   exec(`git commit -m "chore: bump version to ${newVersion}"`);
 
   // Step 5: Create and push tag
@@ -181,9 +181,7 @@ async function main() {
       `gh release create v${newVersion} ` +
       `--title "v${newVersion}" ` +
       `--notes-file "${notesFile}" ` +
-      `teams-distribution/odsp-memory-skill-${newVersion}.tgz ` +
-      `teams-distribution/install.ps1 ` +
-      `teams-distribution/INSTALL.md`
+      `teams-distribution/odsp-memory-skill-${newVersion}.tgz`
     );
   } finally {
     // Clean up temp file
