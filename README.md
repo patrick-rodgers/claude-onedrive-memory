@@ -76,7 +76,9 @@ Your selection is saved to `~/.claude/odsp-memory/config.json`.
 
 ## Usage
 
-### Store a Memory
+### Basic Operations
+
+#### Store a Memory
 
 ```bash
 # Basic
@@ -84,9 +86,12 @@ node dist/index.js remember project "This codebase uses React 18 with TypeScript
 
 # With tags
 node dist/index.js remember decision "Using Zustand for state" --tags=architecture,frontend
+
+# With priority and expiration
+node dist/index.js remember task "Fix bug #123" --priority=high --ttl=7d
 ```
 
-### Recall Memories
+#### Recall Memories
 
 ```bash
 # Recent memories
@@ -102,24 +107,148 @@ node dist/index.js recall "database schema"
 node dist/index.js recall authentication --category=decision --limit=5
 ```
 
-### List All Memories
+#### Update a Memory
+
+```bash
+# Update content
+node dist/index.js update abc123 "Updated content"
+
+# Update tags
+node dist/index.js update abc123 --tags=new-tag,updated
+```
+
+#### List All Memories
 
 ```bash
 node dist/index.js list
 node dist/index.js list decision
+node dist/index.js list --project  # Current project only
 ```
 
-### Forget a Memory
+#### Forget a Memory
 
 ```bash
 # Use full or partial ID
 node dist/index.js forget abc12345
 ```
 
-### Check Status
+### Analytics & Reporting
+
+#### Statistics
 
 ```bash
+# Show comprehensive memory statistics
+node dist/index.js stats
+```
+
+Output includes:
+- Total memories and age distribution
+- Breakdown by category, project, priority
+- Top tags
+- Health status (expired/stale memories)
+- Relationship statistics
+
+#### Relationship Graph
+
+```bash
+# Visualize all memory relationships
+node dist/index.js graph
+
+# Show subgraph from specific memory
+node dist/index.js graph abc123
+
+# Control depth
+node dist/index.js graph abc123 --depth=2
+```
+
+Generates mermaid diagrams showing how memories are connected via links.
+
+#### Export Memories
+
+```bash
+# Export all memories as JSON
+node dist/index.js export --format=json > backup.json
+
+# Export as markdown
+node dist/index.js export --format=markdown > memories.md
+
+# Export specific category
+node dist/index.js export --format=json --category=project > project-memories.json
+```
+
+### Batch Operations
+
+#### Batch Tagging
+
+```bash
+# Tag all memories matching a query
+node dist/index.js tag refactor --query="code cleanup"
+
+# Tag all in a category
+node dist/index.js tag deprecated --category=task
+
+# Always preview first with dry-run
+node dist/index.js tag important --category=decision --dry-run
+```
+
+#### Batch Untagging
+
+```bash
+# Remove tag from all memories
+node dist/index.js untag old-tag
+
+# Remove tag from search results
+node dist/index.js untag deprecated --query="updated"
+
+# Preview with dry-run
+node dist/index.js untag temp --dry-run
+```
+
+#### Bulk Delete
+
+```bash
+# Delete all expired memories
+node dist/index.js bulk-delete --expired
+
+# Delete stale memories (>90 days old)
+node dist/index.js bulk-delete --stale
+
+# Delete by category
+node dist/index.js bulk-delete --category=task --expired
+
+# ALWAYS preview first!
+node dist/index.js bulk-delete --stale --dry-run
+```
+
+### Relationships
+
+```bash
+# Link two memories
+node dist/index.js link abc123 def456
+
+# See related memories
+node dist/index.js related abc123
+
+# Unlink memories
+node dist/index.js link abc123 def456 --unlink
+
+# Merge multiple memories
+node dist/index.js merge abc123 def456 ghi789 --title="Combined Notes"
+```
+
+### Maintenance
+
+```bash
+# Clean up expired memories
+node dist/index.js cleanup --dry-run
+node dist/index.js cleanup
+
+# Check status
 node dist/index.js status
+
+# Configure OneDrive folder
+node dist/index.js config list
+node dist/index.js config set 2
 ```
 
 ## Categories

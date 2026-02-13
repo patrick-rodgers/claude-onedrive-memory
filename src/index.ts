@@ -23,6 +23,19 @@ import {
   getTagsFromPatterns,
   detectProjectChange,
 } from './triggers.js';
+import {
+  getMemoryStatistics,
+  formatStats,
+  generateRelationshipGraph,
+  exportToJSON,
+  exportToMarkdown,
+} from './analytics.js';
+import {
+  batchAddTag,
+  batchRemoveTag,
+  bulkDelete,
+  formatBatchResult,
+} from './batch.js';
 import type { Config, MemoryCategory, MemoryPriority, CommandResult } from './types.js';
 import type { ProjectFilterOptions } from './search.js';
 
@@ -905,6 +918,183 @@ async function handleContext(
   }
 }
 
+async function handleStats(config: Config): Promise<CommandResult> {
+  try {
+    const stats = await getMemoryStatistics(config);
+    return {
+      success: true,
+      message: formatStats(stats),
+      data: stats,
+    };
+  } catch (error) {
+    return {
+      success: false,
+      message: `Failed to generate statistics: ${error instanceof Error ? error.message : 'Unknown error'}`,
+    };
+  }
+}
+
+async function handleGraph(
+  config: Config,
+  args: string[],
+  flags: Record<string, string | boolean>
+): Promise<CommandResult> {
+  const fromId = args[0];
+  const depth = typeof flags.depth === 'string' ? parseInt(flags.depth, 10) : 3;
+
+  try {
+    const graph = await generateRelationshipGraph(config, fromId, depth);
+    return {
+      success: true,
+      message: graph,
+    };
+  } catch (error) {
+    return {
+      success: false,
+      message: `Failed to generate graph: ${error instanceof Error ? error.message : 'Unknown error'}`,
+    };
+  }
+}
+
+async function handleExport(
+  config: Config,
+  args: string[],
+  flags: Record<string, string | boolean>
+): Promise<CommandResult> {
+  const format = typeof flags.format === 'string' ? flags.format : 'json';
+  const category = typeof flags.category === 'string' ? flags.category : undefined;
+
+  try {
+    let content: string;
+
+    if (format === 'json') {
+      content = await exportToJSON(config, category);
+    } else if (format === 'markdown' || format === 'md') {
+      content = await exportToMarkdown(config, category);
+    } else {
+      return {
+        success: false,
+        message: `Unknown format: ${format}. Use 'json' or 'markdown'.`,
+      };
+    }
+
+    return {
+      success: true,
+      message: content,
+    };
+  } catch (error) {
+    return {
+      success: false,
+      message: `Failed to export: ${error instanceof Error ? error.message : 'Unknown error'}`,
+    };
+  }
+}
+
+async function handleTag(
+  config: Config,
+  args: string[],
+  flags: Record<string, string | boolean>
+): Promise<CommandResult> {
+  if (args.length < 1) {
+    return {
+      success: false,
+      message: 'Usage: tag <tag-name> [--query="search"] [--category=type] [--dry-run]',
+    };
+  }
+
+  const tag = args[0];
+  const query = typeof flags.query === 'string' ? flags.query : undefined;
+  const category = typeof flags.category === 'string' ? flags.category as MemoryCategory : undefined;
+  const dryRun = flags['dry-run'] === true || flags.n === true;
+
+  try {
+    const result = await batchAddTag(config, tag, { query, category, dryRun });
+
+    return {
+      success: true,
+      message: formatBatchResult(result, dryRun ? `Would tag with #${tag}` : `Tagged with #${tag}`),
+      data: result,
+    };
+  } catch (error) {
+    return {
+      success: false,
+      message: `Failed to tag memories: ${error instanceof Error ? error.message : 'Unknown error'}`,
+    };
+  }
+}
+
+async function handleUntag(
+  config: Config,
+  args: string[],
+  flags: Record<string, string | boolean>
+): Promise<CommandResult> {
+  if (args.length < 1) {
+    return {
+      success: false,
+      message: 'Usage: untag <tag-name> [--query="search"] [--category=type] [--all] [--dry-run]',
+    };
+  }
+
+  const tag = args[0];
+  const query = typeof flags.query === 'string' ? flags.query : undefined;
+  const category = typeof flags.category === 'string' ? flags.category as MemoryCategory : undefined;
+  const dryRun = flags['dry-run'] === true || flags.n === true;
+
+  try {
+    const result = await batchRemoveTag(config, tag, { query, category, dryRun });
+
+    return {
+      success: true,
+      message: formatBatchResult(result, dryRun ? `Would remove tag #${tag}` : `Removed tag #${tag}`),
+      data: result,
+    };
+  } catch (error) {
+    return {
+      success: false,
+      message: `Failed to untag memories: ${error instanceof Error ? error.message : 'Unknown error'}`,
+    };
+  }
+}
+
+async function handleBulkDelete(
+  config: Config,
+  flags: Record<string, string | boolean>
+): Promise<CommandResult> {
+  const category = typeof flags.category === 'string' ? flags.category as MemoryCategory : undefined;
+  const expired = flags.expired === true;
+  const stale = flags.stale === true;
+  const query = typeof flags.query === 'string' ? flags.query : undefined;
+  const dryRun = flags['dry-run'] === true || flags.n === true;
+
+  if (!expired && !stale && !query && !category) {
+    return {
+      success: false,
+      message: 'Must specify at least one filter: --expired, --stale, --query, or --category\nUse --dry-run to preview what would be deleted.',
+    };
+  }
+
+  try {
+    const result = await bulkDelete(config, {
+      category,
+      expired,
+      stale,
+      query,
+      dryRun,
+    });
+
+    return {
+      success: true,
+      message: formatBatchResult(result, dryRun ? 'Would delete' : 'Deleted'),
+      data: result,
+    };
+  } catch (error) {
+    return {
+      success: false,
+      message: `Failed to bulk delete: ${error instanceof Error ? error.message : 'Unknown error'}`,
+    };
+  }
+}
+
 function handleHelp(): CommandResult {
   const help = `
 OneDrive Memory Skill for Claude Code
@@ -946,6 +1136,32 @@ COMMANDS:
 
   merge <id1> <id2> [id3...]      Combine multiple memories into one
     --title="New title"           Set a custom title for the merged memory
+
+  stats                           Show memory statistics and analytics
+
+  graph [id]                      Visualize memory relationships as mermaid diagram
+    --depth=<number>              Max relationship depth to show (default: 3)
+
+  export                          Export memories to file
+    --format=json|markdown        Output format (default: json)
+    --category=<category>         Export specific category only
+
+  tag <tag-name>                  Add tag to multiple memories
+    --query="search"              Tag memories matching search
+    --category=<category>         Tag all in category
+    --dry-run, -n                 Preview without making changes
+
+  untag <tag-name>                Remove tag from multiple memories
+    --query="search"              Untag memories matching search
+    --category=<category>         Untag all in category
+    --dry-run, -n                 Preview without making changes
+
+  bulk-delete                     Delete multiple memories at once
+    --expired                     Delete all expired memories
+    --stale                       Delete memories >90 days old
+    --query="search"              Delete memories matching search
+    --category=<category>         Delete all in category
+    --dry-run, -n                 Preview without deleting
 
   status                          Show OneDrive folder and current project
 
@@ -998,6 +1214,39 @@ RELATIONSHIPS & CONSOLIDATION:
   - Tags and relationships from all memories are combined
   - Use --title to set a new title for the merged memory
 
+ANALYTICS & REPORTING:
+  Use 'stats' to see memory statistics and health:
+  - Total count, age distribution
+  - Breakdown by category, project, priority
+  - Top tags and relationships
+  - Expired/stale detection
+
+  Use 'graph' to visualize relationships:
+  - Full graph shows all connected memories
+  - Specify ID to show subgraph from that memory
+  - Generates mermaid diagrams (great for documentation)
+
+  Use 'export' for backups or sharing:
+  - JSON format for importing/backup
+  - Markdown format for documentation
+  - Filter by category to export subset
+
+BATCH OPERATIONS:
+  Use 'tag' to add tags to multiple memories at once:
+  - Search-based: tag memories matching a query
+  - Category-based: tag all memories in a category
+  - Always use --dry-run first to preview changes
+
+  Use 'untag' to remove tags in bulk:
+  - Remove deprecated tags across all memories
+  - Clean up misspelled tags
+  - Use --dry-run to preview
+
+  Use 'bulk-delete' for cleanup:
+  - Remove expired memories in bulk
+  - Clean up stale memories (>90 days old)
+  - Always use --dry-run first!
+
 EXAMPLES:
   remember project "The API uses Express with TypeScript, routes in /src/routes"
   remember decision "Chose PostgreSQL over MongoDB for ACID compliance" --tags=database,architecture
@@ -1018,6 +1267,15 @@ EXAMPLES:
   merge abc123 def456 --title="Combined Notes"
   cleanup --dry-run
   forget abc123
+  stats
+  graph abc123 --depth=2
+  export --format=json > backup.json
+  export --format=markdown --category=project > project-notes.md
+  tag refactor --query="code cleanup"
+  tag deprecated --category=task --dry-run
+  untag old-tag --query="updated"
+  bulk-delete --expired --dry-run
+  bulk-delete --stale --category=task
 `;
 
   return {
@@ -1126,6 +1384,24 @@ async function main(): Promise<void> {
       break;
     case 'merge':
       result = await handleMerge(config, args, flags);
+      break;
+    case 'stats':
+      result = await handleStats(config);
+      break;
+    case 'graph':
+      result = await handleGraph(config, args, flags);
+      break;
+    case 'export':
+      result = await handleExport(config, args, flags);
+      break;
+    case 'tag':
+      result = await handleTag(config, args, flags);
+      break;
+    case 'untag':
+      result = await handleUntag(config, args, flags);
+      break;
+    case 'bulk-delete':
+      result = await handleBulkDelete(config, flags);
       break;
     default:
       result = {

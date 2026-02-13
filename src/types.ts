@@ -69,5 +69,5 @@ export type Command =
 export interface CommandResult {
   success: boolean;
   message: string;
-  data?: Memory[] | Memory | MemoryIndexEntry[];
+  data?: Memory[] | Memory | MemoryIndexEntry[] | any; // Allow any for stats, batch results
 }
