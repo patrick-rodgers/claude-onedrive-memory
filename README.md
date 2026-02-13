@@ -1,7 +1,6 @@
 # OneDrive Memory Skill for Claude Code
 
 [![GitHub release (latest by date)](https://img.shields.io/github/v/release/patrick-rodgers/claude-onedrive-memory)](https://github.com/patrick-rodgers/claude-onedrive-memory/releases/latest)
-[![npm](https://img.shields.io/npm/v/odsp-memory-skill)](https://www.npmjs.com/package/odsp-memory-skill)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 Persistent memory for Claude Code using your local OneDrive folder. Memories sync automatically via the OneDrive client - no API authentication required.
