@@ -192,8 +192,13 @@ async function main() {
     }
   }
 
+  // Step 7: Publish to npm
+  console.log('\n7️⃣  Publishing to npm...');
+  exec('npm publish');
+
   console.log('\n✅ Release complete!');
   console.log(`\n🎉 Version ${newVersion} has been released`);
+  console.log(`   npm: https://www.npmjs.com/package/odsp-memory-skill`);
   console.log(`   View release: https://github.com/$(git config --get remote.origin.url | sed 's/.*://;s/.git$//')/releases/tag/v${newVersion}`);
 }
 

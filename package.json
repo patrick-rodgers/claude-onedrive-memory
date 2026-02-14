@@ -5,13 +5,26 @@
   "type": "module",
   "main": "dist/index.js",
   "bin": {
-    "odsp-memory": "dist/index.js"
+    "odsp-memory": "dist/index.js",
+    "odsp-memory-mcp": "dist/mcp-server.js"
   },
   "files": [
     "dist",
     "skill.md",
-    "README.md"
+    "README.md",
+    ".claude-plugin",
+    ".mcp.json",
+    "skills",
+    "commands",
+    "hooks"
   ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/patrick-rodgers/claude-onedrive-memory.git"
+  },
   "scripts": {
     "build": "tsc",
     "start": "node dist/index.js",
@@ -34,8 +47,10 @@
     "node": ">=18.0.0"
   },
   "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.12.0",
     "gray-matter": "^4.0.3",
-    "uuid": "^9.0.0"
+    "uuid": "^9.0.0",
+    "zod": "^3.23.0"
   },
   "devDependencies": {
     "@types/node": "^20.10.0",
