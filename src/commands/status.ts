@@ -17,17 +17,28 @@ export async function status(
 
   let message = '';
 
-  if (folders.length === 0) {
+  // Try to get storage folder first - it handles both OneDrive and custom paths
+  let storageFolder: string | null = null;
+  try {
+    storageFolder = getStorageFolder(config);
+  } catch {
+    // Storage folder not available
+  }
+
+  // Only fail if we have no OneDrive folders AND no custom storage configured
+  if (folders.length === 0 && !storageFolder) {
     return {
       success: false,
       message:
-        'No OneDrive folders found.\nMake sure OneDrive is installed and syncing.',
+        'No OneDrive folders found and no custom storage configured.\n' +
+        'Make sure OneDrive is installed and syncing, or use "configure_storage" tool to set a custom location.',
     };
   }
 
+  // Display OneDrive information if available
   if (folders.length === 1) {
     message = `OneDrive folder: ${currentFolder}`;
-  } else {
+  } else if (folders.length > 1) {
     message = `Multiple OneDrive folders detected:\n`;
     folders.forEach((folder, i) => {
       const isCurrent = folder === currentFolder;
@@ -36,11 +47,13 @@ export async function status(
     message += `\nTo change, run: config set <number>`;
   }
 
-  try {
-    const storageFolder = getStorageFolder(config);
-    message += `\nStorage folder: ${storageFolder}`;
-  } catch {
-    // Storage folder doesn't exist yet, that's fine
+  // Display storage folder (works for both OneDrive and custom paths)
+  if (storageFolder) {
+    if (message) {
+      message += `\nStorage folder: ${storageFolder}`;
+    } else {
+      message = `Storage folder: ${storageFolder}`;
+    }
   }
 
   // Show current project context
