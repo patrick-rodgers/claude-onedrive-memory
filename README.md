@@ -8,7 +8,7 @@
 
 ## ✨ Features
 
-- **🧠 16 Memory Tools** - Complete toolkit for storing, searching, linking, and managing memories
+- **🧠 17 Memory Tools** - Complete toolkit for storing, searching, linking, and managing memories
 - **📦 MCP Resources** - Browse memories as resources (`memory://list`, `memory://{id}`, etc.)
 - **🎯 Smart Context** - Automatically detects project patterns and recalls relevant memories
 - **🔗 Memory Relationships** - Link related memories and visualize connections
