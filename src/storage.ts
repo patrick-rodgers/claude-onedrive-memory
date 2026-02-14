@@ -114,6 +114,8 @@ export function needsOneDriveSelection(): { needsSelection: boolean; folders: st
 
 // Get the app's storage folder within OneDrive or custom location
 export function getStorageFolder(config: Config): string {
+  // Mark config as intentionally unused to satisfy static analysis
+  void config;
   // Check for saved preference first
   const storageConfig = loadStorageConfig();
 
