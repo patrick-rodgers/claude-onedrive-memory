@@ -9,7 +9,13 @@
   },
   "files": [
     "dist",
-    "README.md"
+    "README.md",
+    ".claude-plugin",
+    ".mcp.json",
+    "CLAUDE.md",
+    "commands",
+    "hooks",
+    "skills"
   ],
   "scripts": {
     "build": "tsc",
@@ -22,11 +28,12 @@
   "keywords": [
     "claude",
     "claude-code",
+    "claude-plugin",
     "memory",
     "onedrive",
-    "skill",
     "mcp",
-    "model-context-protocol"
+    "model-context-protocol",
+    "persistent-memory"
   ],
   "author": "Patrick Rodgers",
   "license": "MIT",
