@@ -24,7 +24,7 @@
 ### Prerequisites
 
 - Node.js 18+ ([Download](https://nodejs.org/))
-- OneDrive client installed and syncing (Windows, macOS, or Linux)
+- OneDrive client installed and syncing (Windows, macOS, or Linux) — required for the default auto-detected storage path; optional if you configure a custom storage location with `configure_storage`
 - Claude Desktop or Claude Code CLI
 
 ### Installation
