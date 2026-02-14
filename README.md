@@ -121,7 +121,7 @@ Memories are automatically scoped to your current git repository. When you store
 | `status` | Check OneDrive detection and system status |
 | `configure_storage` | Select OneDrive folder or set custom storage location |
 
-### Advanced Operations (7 tools)
+### Advanced Operations (8 tools)
 
 | Tool | Description |
 |------|-------------|
