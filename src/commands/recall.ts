@@ -72,7 +72,7 @@ export async function recall(
       const scopeHint = projectOptions.allProjects
         ? ''
         : context.projectName
-          ? `\nSearched in project: ${context.projectName} (use --all for all projects)`
+          ? `\nSearched in project: ${context.projectName} (to search all projects, set "all": true in the tool arguments)`
           : '\nNo project context detected (showing global memories only)';
       return {
         success: true,
