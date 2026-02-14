@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "claude-onedrive-memory": {
+      "command": "npx",
+      "args": ["-y", "@patrick-rodgers/claude-onedrive-memory"]
+    }
+  }
+}

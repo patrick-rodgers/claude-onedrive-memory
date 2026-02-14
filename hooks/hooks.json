@@ -1,0 +1,10 @@
+{
+  "SessionStart": [
+    {
+      "type": "command",
+      "command": "bash",
+      "args": ["hooks/session-start.sh"],
+      "description": "Auto-recall project context at session start"
+    }
+  ]
+}
