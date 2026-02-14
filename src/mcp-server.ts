@@ -753,11 +753,27 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
               }
 
               const currentFolder = findOneDriveFolder();
+              const isCustomPathActive =
+                !!currentFolder && !folders.includes(currentFolder);
+
               let message = '**Available OneDrive folders:**\n\n';
               folders.forEach((folder, i) => {
-                const isCurrent = folder === currentFolder;
+                const isCurrent =
+                  !isCustomPathActive && !!currentFolder && folder === currentFolder;
                 message += `  ${i + 1}. ${folder}${isCurrent ? ' ✓ (current)' : ''}\n`;
               });
+
+              if (currentFolder) {
+                if (isCustomPathActive) {
+                  message +=
+                    '\n**Current storage preference:** Custom path\n' +
+                    `Path: ${currentFolder}\n`;
+                } else {
+                  message +=
+                    '\n**Current storage preference:** OneDrive\n' +
+                    `Path: ${currentFolder}\n`;
+                }
+              }
               message += '\n**To select:**\n';
               message += '`configure_storage` with action="select" and index=<number>\n\n';
               message += '**Or set custom path:**\n';
