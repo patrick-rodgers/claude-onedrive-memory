@@ -1,24 +1,22 @@
 {
-  "name": "odsp-memory-skill",
-  "version": "0.0.3",
-  "description": "Claude Code skill for persistent memory using OneDrive local sync",
+  "name": "@patrick-rodgers/claude-onedrive-memory",
+  "version": "0.2.0",
+  "description": "Persistent memory for Claude using OneDrive - MCP server with resources",
   "type": "module",
-  "main": "dist/index.js",
+  "main": "dist/mcp-server.js",
   "bin": {
-    "odsp-memory": "dist/index.js"
+    "claude-onedrive-memory": "dist/mcp-server.js"
   },
   "files": [
     "dist",
-    "skill.md",
     "README.md"
   ],
   "scripts": {
     "build": "tsc",
-    "start": "node dist/index.js",
+    "start": "node dist/mcp-server.js",
     "dev": "tsc --watch",
     "prepare": "npm run build",
-    "test": "node dist/index.js help",
-    "package": "powershell -ExecutionPolicy Bypass -File ./scripts/package-for-teams.ps1",
+    "test": "npx @modelcontextprotocol/inspector node dist/mcp-server.js",
     "release": "tsx scripts/release.ts"
   },
   "keywords": [
@@ -26,14 +24,25 @@
     "claude-code",
     "memory",
     "onedrive",
-    "skill"
+    "skill",
+    "mcp",
+    "model-context-protocol"
   ],
-  "author": "",
+  "author": "Patrick Rodgers",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/patrick-rodgers/claude-onedrive-memory.git"
+  },
+  "homepage": "https://github.com/patrick-rodgers/claude-onedrive-memory#readme",
+  "bugs": {
+    "url": "https://github.com/patrick-rodgers/claude-onedrive-memory/issues"
+  },
   "engines": {
     "node": ">=18.0.0"
   },
   "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.4",
     "gray-matter": "^4.0.3",
     "uuid": "^9.0.0"
   },

@@ -10,6 +10,7 @@ const CONFIG_FILE = join(CONFIG_DIR, 'config.json');
 
 interface StorageConfig {
   oneDrivePath?: string;
+  isCustomPath?: boolean; // True if user set a custom path (not OneDrive)
 }
 
 // Load saved config
@@ -84,12 +85,12 @@ export function findOneDriveFolder(): string | null {
   return folders.length > 0 ? folders[0] : null;
 }
 
-// Set the preferred OneDrive folder
-export function setOneDriveFolder(path: string): void {
+// Set the preferred OneDrive folder or custom storage path
+export function setOneDriveFolder(path: string, isCustom: boolean = false): void {
   if (!existsSync(path)) {
     throw new Error(`Path does not exist: ${path}`);
   }
-  saveStorageConfig({ oneDrivePath: path });
+  saveStorageConfig({ oneDrivePath: path, isCustomPath: isCustom });
 }
 
 // Clear the saved preference
@@ -111,14 +112,31 @@ export function needsOneDriveSelection(): { needsSelection: boolean; folders: st
   return { needsSelection: folders.length > 1, folders };
 }
 
-// Get the app's storage folder within OneDrive
+// Get the app's storage folder within OneDrive or custom location
 export function getStorageFolder(config: Config): string {
+  // Mark config as intentionally unused to satisfy static analysis
+  void config;
+  // Check for saved preference first
+  const storageConfig = loadStorageConfig();
+
+  // If custom path is set, use it directly
+  if (storageConfig.isCustomPath && storageConfig.oneDrivePath) {
+    if (!existsSync(storageConfig.oneDrivePath)) {
+      throw new Error(
+        `Custom storage path not found: ${storageConfig.oneDrivePath}\n` +
+        'Use "configure_storage" tool to set a valid location.'
+      );
+    }
+    return storageConfig.oneDrivePath;
+  }
+
+  // Otherwise, find OneDrive folder
   const oneDriveFolder = findOneDriveFolder();
 
   if (!oneDriveFolder) {
     throw new Error(
       'Could not find OneDrive folder. Make sure OneDrive is installed and syncing.\n' +
-      'Run "status" to check detection.'
+      'Or use "configure_storage" tool to set a custom storage location.'
     );
   }
 
