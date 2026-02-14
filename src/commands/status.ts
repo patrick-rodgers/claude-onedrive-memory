@@ -37,7 +37,7 @@ export async function status(
 
   // Display OneDrive information if available
   if (folders.length === 1) {
-    message = `OneDrive folder: ${currentFolder}`;
+    message = `OneDrive folder: ${folders[0]}`;
   } else if (folders.length > 1) {
     message = `Multiple OneDrive folders detected:\n`;
     folders.forEach((folder, i) => {
