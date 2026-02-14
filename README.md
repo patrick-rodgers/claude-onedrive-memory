@@ -1,5 +1,6 @@
-# OneDrive Memory Skill for Claude Code
+# OneDrive Memory Plugin for Claude Code
 
+[![npm version](https://img.shields.io/npm/v/odsp-memory-skill)](https://www.npmjs.com/package/odsp-memory-skill)
 [![GitHub release (latest by date)](https://img.shields.io/github/v/release/patrick-rodgers/claude-onedrive-memory)](https://github.com/patrick-rodgers/claude-onedrive-memory/releases/latest)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
@@ -7,21 +8,44 @@ Persistent memory for Claude Code using your local OneDrive folder. Memories syn
 
 ## How It Works
 
-This skill writes memory files directly to your local OneDrive folder. The OneDrive sync client handles uploading to the cloud automatically. This means:
+This plugin stores memory files directly in your local OneDrive folder. The OneDrive sync client handles uploading to the cloud automatically. This means:
 
 - **No authentication required** - Uses your existing OneDrive sync
 - **Works offline** - Memories are stored locally first, synced when online
 - **Cross-device sync** - Access memories from any device with OneDrive
 - **Human-readable** - Memories are markdown files you can view/edit directly
 
-## Quick Start
+## Installation
 
-### Prerequisites
+### As a Claude Code Plugin (Recommended)
 
-- Node.js 18+ ([Download](https://nodejs.org/))
-- OneDrive client installed and syncing (Windows, macOS, or Linux)
+Install directly as a Claude Code plugin — no manual setup required:
 
-### One-Command Installation
+```bash
+claude plugin add odsp-memory-skill
+```
+
+This automatically:
+- Installs the MCP server providing 18 memory tools
+- Adds `/remember`, `/recall`, and `/memory-status` slash commands
+- Sets up auto-context recall on session start via a SessionStart hook
+- Provides the memory skill documentation to Claude
+
+Once installed, Claude will proactively remember and recall context across sessions.
+
+**Prerequisites:** OneDrive client installed and syncing (Windows, macOS, or Linux).
+
+### Verify Installation
+
+After installing the plugin, start a new Claude Code session. Claude will automatically attempt to recall relevant memories via the `memory_context` tool. You can also test directly:
+
+- `/remember project "This codebase uses React 18 with TypeScript"` - Store a memory
+- `/recall React` - Search memories
+- `/memory-status` - Check OneDrive detection and stats
+
+### As a CLI Tool (Legacy)
+
+The CLI tool is still available for direct terminal usage or environments where plugins are not supported.
 
 **Windows (PowerShell):**
 ```powershell
@@ -33,56 +57,54 @@ iwr -useb https://raw.githubusercontent.com/patrick-rodgers/claude-onedrive-memo
 curl -fsSL https://raw.githubusercontent.com/patrick-rodgers/claude-onedrive-memory/main/install.sh | bash
 ```
 
-> 💡 **Always up-to-date:** The installer automatically downloads the latest release from GitHub. No version numbers to remember!
-
-That's it! The installer will:
-1. ✅ Download the **latest release** automatically
-2. ✅ Install the `odsp-memory` command globally
-3. ✅ Configure Claude Code for auto-recall
-4. ✅ Set up permissions for seamless operation
-
-### Verify Installation
-
+Or install from npm:
 ```bash
-odsp-memory status
-```
-
-### Start Using in Claude Code
-
-Claude will now automatically:
-- **Auto-recall** relevant memories when you start sessions
-- **Proactively remember** important context about your projects
-- **Sync memories** across all devices via OneDrive
-
-You can also use the commands directly:
-
-```bash
-# Store a memory
-odsp-memory remember project "This codebase uses React 18 with TypeScript"
-
-# List memories
-odsp-memory list
-
-# Search memories
-odsp-memory recall "React"
-```
-
-### Manual Installation (Alternative)
-
-If you prefer to install manually or contribute to development:
-
-```bash
-git clone https://github.com/patrick-rodgers/claude-onedrive-memory.git
-cd claude-onedrive-memory
-npm install
-npm run build
-npm install -g .
+npm install -g odsp-memory-skill
 odsp-memory setup
 ```
 
+## Plugin Features
+
+### Slash Commands
+
+| Command | Description |
+|---------|-------------|
+| `/remember <category> <content>` | Store a memory (category: project, decision, preference, learning, task) |
+| `/recall [query]` | Search memories, or recall context if no query |
+| `/memory-status` | Show OneDrive status and memory statistics |
+
+### MCP Tools
+
+The plugin provides 18 MCP tools that Claude can use autonomously:
+
+| Tool | Description |
+|------|-------------|
+| `memory_remember` | Store a new memory (auto-scoped to current project) |
+| `memory_recall` | Search and retrieve memories |
+| `memory_context` | Smart recall based on project context and file patterns |
+| `memory_list` | List all memories, optionally filtered |
+| `memory_forget` | Delete a memory by ID |
+| `memory_update` | Update content or tags |
+| `memory_link` | Create/remove bidirectional links between memories |
+| `memory_related` | Show related memories |
+| `memory_merge` | Consolidate multiple memories into one |
+| `memory_cleanup` | Remove expired memories |
+| `memory_stats` | Memory statistics and analytics |
+| `memory_graph` | Visualize relationships as mermaid diagrams |
+| `memory_export` | Export to JSON or markdown |
+| `memory_tag` | Batch add tags |
+| `memory_untag` | Batch remove tags |
+| `memory_bulk_delete` | Bulk delete with filters |
+| `memory_status` | OneDrive detection and project context |
+| `memory_config` | Manage OneDrive folder selection |
+
+### SessionStart Hook
+
+On every new session, the plugin prompts Claude to use `memory_context` to recall up to 5 relevant memories for the current project. This gives Claude automatic awareness of project structure, past decisions, user preferences, and ongoing tasks.
+
 ## OneDrive Detection
 
-The skill automatically detects your OneDrive folder using:
+The plugin automatically detects your OneDrive folder using:
 
 1. **Environment variables** (set by OneDrive client):
    - `OneDriveCommercial` - Work/School account
@@ -93,197 +115,15 @@ The skill automatically detects your OneDrive folder using:
 
 ### Multiple OneDrive Accounts
 
-If you have multiple OneDrive accounts (e.g., work and personal), the skill will prompt you to select one on first use:
+If you have multiple OneDrive accounts, Claude will use the `memory_config` tool to let you select one. Or via the CLI:
 
 ```bash
-# List available OneDrive folders
-node dist/index.js config list
-
-# Select which one to use
-node dist/index.js config set 2
-
-# Reset to auto-detection
-node dist/index.js config reset
+odsp-memory config list      # List available folders
+odsp-memory config set 2     # Select folder #2
+odsp-memory config reset     # Reset to auto-detection
 ```
 
 Your selection is saved to `~/.claude/odsp-memory/config.json`.
-
-## Usage
-
-### Basic Operations
-
-#### Store a Memory
-
-```bash
-# Basic
-node dist/index.js remember project "This codebase uses React 18 with TypeScript"
-
-# With tags
-node dist/index.js remember decision "Using Zustand for state" --tags=architecture,frontend
-
-# With priority and expiration
-node dist/index.js remember task "Fix bug #123" --priority=high --ttl=7d
-```
-
-#### Recall Memories
-
-```bash
-# Recent memories
-node dist/index.js recall
-
-# By category
-node dist/index.js recall --category=project
-
-# Search
-node dist/index.js recall "database schema"
-
-# Combined
-node dist/index.js recall authentication --category=decision --limit=5
-```
-
-#### Update a Memory
-
-```bash
-# Update content
-node dist/index.js update abc123 "Updated content"
-
-# Update tags
-node dist/index.js update abc123 --tags=new-tag,updated
-```
-
-#### List All Memories
-
-```bash
-node dist/index.js list
-node dist/index.js list decision
-node dist/index.js list --project  # Current project only
-```
-
-#### Forget a Memory
-
-```bash
-# Use full or partial ID
-node dist/index.js forget abc12345
-```
-
-### Analytics & Reporting
-
-#### Statistics
-
-```bash
-# Show comprehensive memory statistics
-node dist/index.js stats
-```
-
-Output includes:
-- Total memories and age distribution
-- Breakdown by category, project, priority
-- Top tags
-- Health status (expired/stale memories)
-- Relationship statistics
-
-#### Relationship Graph
-
-```bash
-# Visualize all memory relationships
-node dist/index.js graph
-
-# Show subgraph from specific memory
-node dist/index.js graph abc123
-
-# Control depth
-node dist/index.js graph abc123 --depth=2
-```
-
-Generates mermaid diagrams showing how memories are connected via links.
-
-#### Export Memories
-
-```bash
-# Export all memories as JSON
-node dist/index.js export --format=json > backup.json
-
-# Export as markdown
-node dist/index.js export --format=markdown > memories.md
-
-# Export specific category
-node dist/index.js export --format=json --category=project > project-memories.json
-```
-
-### Batch Operations
-
-#### Batch Tagging
-
-```bash
-# Tag all memories matching a query
-node dist/index.js tag refactor --query="code cleanup"
-
-# Tag all in a category
-node dist/index.js tag deprecated --category=task
-
-# Always preview first with dry-run
-node dist/index.js tag important --category=decision --dry-run
-```
-
-#### Batch Untagging
-
-```bash
-# Remove tag from all memories
-node dist/index.js untag old-tag
-
-# Remove tag from search results
-node dist/index.js untag deprecated --query="updated"
-
-# Preview with dry-run
-node dist/index.js untag temp --dry-run
-```
-
-#### Bulk Delete
-
-```bash
-# Delete all expired memories
-node dist/index.js bulk-delete --expired
-
-# Delete stale memories (>90 days old)
-node dist/index.js bulk-delete --stale
-
-# Delete by category
-node dist/index.js bulk-delete --category=task --expired
-
-# ALWAYS preview first!
-node dist/index.js bulk-delete --stale --dry-run
-```
-
-### Relationships
-
-```bash
-# Link two memories
-node dist/index.js link abc123 def456
-
-# See related memories
-node dist/index.js related abc123
-
-# Unlink memories
-node dist/index.js link abc123 def456 --unlink
-
-# Merge multiple memories
-node dist/index.js merge abc123 def456 ghi789 --title="Combined Notes"
-```
-
-### Maintenance
-
-```bash
-# Clean up expired memories
-node dist/index.js cleanup --dry-run
-node dist/index.js cleanup
-
-# Check status
-node dist/index.js status
-
-# Configure OneDrive folder
-node dist/index.js config list
-node dist/index.js config set 2
-```
 
 ## Categories
 
@@ -327,19 +167,33 @@ updated: 2024-02-05T10:30:00Z
 This codebase uses React 18 with TypeScript...
 ```
 
-## Claude Code Integration
+## CLI Usage (Legacy)
 
-**Automatic Setup:** The installation script automatically configures Claude Code to:
-- Load memory instructions via the `skill.md` file
-- Auto-recall relevant memories when starting new sessions
-- Allow memory commands to run without permission prompts
+If using the CLI tool directly, all commands are available via `odsp-memory`:
 
-The integration teaches Claude:
-- When to proactively remember information (projects, decisions, preferences)
-- How to search and recall memories intelligently
-- Best practices for memory management across sessions
+```bash
+odsp-memory remember project "The API uses Express with TypeScript"
+odsp-memory recall "database"
+odsp-memory list decision
+odsp-memory forget abc123
+odsp-memory stats
+odsp-memory context --verbose
+odsp-memory export --format=markdown
+odsp-memory help    # Full command reference
+```
 
-No manual configuration needed! Just install and start chatting with Claude.
+## Development
+
+```bash
+git clone https://github.com/patrick-rodgers/claude-onedrive-memory.git
+cd claude-onedrive-memory
+npm install
+npm run build        # Compile TypeScript
+npm run dev          # Watch mode
+
+# Test the plugin locally
+claude --plugin-dir .
+```
 
 ## Troubleshooting
 
@@ -347,7 +201,7 @@ No manual configuration needed! Just install and start chatting with Claude.
 
 - Make sure OneDrive is installed and signed in
 - Check that sync is enabled (look for OneDrive icon in system tray)
-- Run `node dist/index.js status` to see detection details
+- Use `/memory-status` or `odsp-memory status` to see detection details
 - On Windows, check if `%OneDriveCommercial%` or `%OneDrive%` environment variables are set
 
 ### Memories not syncing
@@ -358,7 +212,7 @@ No manual configuration needed! Just install and start chatting with Claude.
 
 ### Multiple OneDrive accounts
 
-The skill prioritizes work/school accounts over personal accounts. If you need to use a specific account, you can set the `OneDrive` environment variable to your preferred path.
+The plugin prioritizes work/school accounts over personal accounts. If you need to use a specific account, you can set the `OneDrive` environment variable to your preferred path, or use the `memory_config` tool to select a folder.
 
 ## License
 
@@ -366,4 +220,4 @@ MIT
 
 ## Warranty Disclaimer
 
-This software is provided “AS IS”, without warranty of any kind, express or implied, including but not limited to the warranties of merchantability, fitness for a particular purpose, and noninfringement. In no event shall the authors or copyright holders be liable for any claim, damages, or other liability, whether in an action of contract, tort, or otherwise, arising from, out of, or in connection with the software or the use or other dealings in the software.
+This software is provided "AS IS", without warranty of any kind, express or implied, including but not limited to the warranties of merchantability, fitness for a particular purpose, and noninfringement. In no event shall the authors or copyright holders be liable for any claim, damages, or other liability, whether in an action of contract, tort, or otherwise, arising from, out of, or in connection with the software or the use or other dealings in the software.

@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "odsp-memory": {
+      "command": "npx",
+      "args": ["-y", "-p", "odsp-memory-skill", "odsp-memory-mcp"]
+    }
+  }
+}

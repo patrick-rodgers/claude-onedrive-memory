@@ -1,0 +1,8 @@
+{
+  "name": "odsp-memory",
+  "version": "0.1.0",
+  "description": "Persistent memory for Claude Code using OneDrive local sync",
+  "author": { "name": "Patrick Rodgers" },
+  "repository": "https://github.com/patrick-rodgers/claude-onedrive-memory",
+  "license": "MIT"
+}
