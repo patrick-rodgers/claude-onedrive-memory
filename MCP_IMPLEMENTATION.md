@@ -15,7 +15,7 @@
 
 **To (v0.2.0):**
 - **Pure MCP server** - Primary and only entry point
-- **15 comprehensive MCP tools** - Full feature parity
+- **17 comprehensive MCP tools** - Full feature parity
 - **MCP Resources** - Browse memories as resources
 - No CLI interface (removed complexity)
 
@@ -46,7 +46,7 @@ memory://category/{category}     → Category memories (JSON)
 - Organized by project/category
 - Human-readable markdown format
 
-### Expanded Tool Set (16 Tools)
+### Expanded Tool Set (17 Tools)
 
 **Core Operations (9 tools):**
 1. `remember` - Store memory
@@ -59,15 +59,15 @@ memory://category/{category}     → Category memories (JSON)
 8. `status` - System status
 9. `configure_storage` - Select OneDrive or set custom path
 
-**Advanced Operations (7 tools):**
-9. `link_memories` - Link/unlink two memories
-10. `get_related` - Get linked memories
-11. `merge_memories` - Merge multiple into one
-12. `batch_tag` - Add/remove tags in bulk
-13. `batch_delete` - Delete multiple (with filters)
-14. `get_statistics` - Comprehensive analytics
-15. `visualize_graph` - Mermaid relationship diagram
-16. `export_memories` - Export to JSON/Markdown
+**Advanced Operations (8 tools):**
+10. `link_memories` - Link/unlink two memories
+11. `get_related` - Get linked memories
+12. `merge_memories` - Merge multiple into one
+13. `batch_tag` - Add/remove tags in bulk
+14. `batch_delete` - Delete multiple (with filters)
+15. `get_statistics` - Comprehensive analytics
+16. `visualize_graph` - Mermaid relationship diagram
+17. `export_memories` - Export to JSON/Markdown
 
 **Previously CLI-only, now in MCP:**
 - Memory relationships (link, related, merge)
@@ -149,7 +149,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
   switch (request.params.name) {
     case 'remember': /* ... */
     case 'recall': /* ... */
-    // ... 15 total tools
+    // ... 17 total tools
   }
 });
 ```
@@ -291,7 +291,7 @@ node dist/mcp-server.js
 
 **After (v0.2.0):**
 - No CLI (removed)
-- 15 MCP tools with full features
+- 17 MCP tools with full features
 - Resources for browsing
 - More natural integration
 
@@ -349,7 +349,7 @@ node dist/mcp-server.js
 
 - **v0.0.1-0.0.3** - CLI-only tool
 - **v0.1.0** - Hybrid CLI + MCP (8 tools)
-- **v0.2.0** - Pure MCP server (15 tools + resources) ← Current
+- **v0.2.0** - Pure MCP server (17 tools + resources) ← Current
 
 ## Files Changed (v0.1.0 → v0.2.0)
 
@@ -357,14 +357,14 @@ node dist/mcp-server.js
 - `src/cli.ts` - CLI entry point (no longer needed)
 
 ### Modified
-- `src/mcp-server.ts` - Complete rewrite with resources + 15 tools
+- `src/mcp-server.ts` - Complete rewrite with resources + 17 tools
 - `package.json` - Updated for MCP-only (bin, description, version)
 - `README.md` - Comprehensive MCP-focused documentation
 - `skill.md` - Updated for MCP tools instead of CLI commands
 
 ### Added
 - MCP Resources support (ListResources, ReadResource handlers)
-- 7 new tools (link_memories, get_related, merge_memories, batch_tag, batch_delete, get_statistics, visualize_graph, export_memories)
+- 8 new tools (link_memories, get_related, merge_memories, batch_tag, batch_delete, get_statistics, visualize_graph, export_memories)
 
 ### Unchanged
 - All core modules (`memory.ts`, `storage.ts`, `search.ts`, etc.)
@@ -376,7 +376,7 @@ node dist/mcp-server.js
 ## Success Criteria
 
 - ✅ Compiles without errors
-- ✅ All 15 tools available
+- ✅ All 17 tools available
 - ✅ Resources work correctly
 - ✅ OneDrive detection works
 - ✅ Project scoping works
