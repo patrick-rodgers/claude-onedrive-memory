@@ -1,5 +1,5 @@
 import { readFile, writeFile, mkdir, unlink } from 'fs/promises';
-import { existsSync, readdirSync, readFileSync, writeFileSync, mkdirSync } from 'fs';
+import { existsSync, readdirSync, readFileSync, writeFileSync, mkdirSync, statSync } from 'fs';
 import { homedir } from 'os';
 import { join, dirname } from 'path';
 import type { Config, MemoryIndex } from './types.js';
@@ -89,6 +89,9 @@ export function findOneDriveFolder(): string | null {
 export function setOneDriveFolder(path: string, isCustom: boolean = false): void {
   if (!existsSync(path)) {
     throw new Error(`Path does not exist: ${path}`);
+  }
+  if (!statSync(path).isDirectory()) {
+    throw new Error(`Path is not a directory: ${path}`);
   }
   saveStorageConfig({ oneDrivePath: path, isCustomPath: isCustom });
 }
