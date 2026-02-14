@@ -6,6 +6,32 @@
 
 **Persistent memory for Claude using your local OneDrive folder.** This MCP server enables Claude to remember project context, decisions, preferences, and learnings across sessions—automatically synced via OneDrive.
 
+## 🚀 Installation
+
+**Add one line to your MCP configuration and restart Claude:**
+
+```json
+{
+  "mcpServers": {
+    "claude-onedrive-memory": {
+      "command": "npx",
+      "args": ["@patrick-rodgers/claude-onedrive-memory"]
+    }
+  }
+}
+```
+
+**Configuration file locations:**
+- **Claude Desktop**: `~/Library/Application Support/Claude/claude_desktop_config.json` (macOS) or `%APPDATA%\Claude\claude_desktop_config.json` (Windows)
+- **Claude Code**: `~/.claude/mcp-servers.json`
+
+**That's it!** After restarting Claude, the memory tools will be automatically available. No API keys, no authentication, no setup required.
+
+### Prerequisites
+
+- **Node.js 18+** ([Download](https://nodejs.org/))
+- **OneDrive** (optional) - For automatic sync across devices. If not installed, you can configure a custom storage location using the `configure_storage` tool.
+
 ## ✨ Features
 
 - **🧠 17 Memory Tools** - Complete toolkit for storing, searching, linking, and managing memories
@@ -18,59 +44,6 @@
 - **📁 Flexible Storage** - Use OneDrive or any custom folder location
 - **🔒 Works Offline** - Memories stored locally first, synced when online
 - **📝 Human-Readable** - Memories are markdown files you can view/edit directly
-
-## 🚀 Quick Start
-
-### Prerequisites
-
-- Node.js 18+ ([Download](https://nodejs.org/))
-- OneDrive client installed and syncing (Windows, macOS, or Linux) — required for the default auto-detected storage path; optional if you configure a custom storage location with `configure_storage`
-- Claude Desktop or Claude Code CLI
-
-### Installation
-
-Add to your MCP configuration:
-
-**Claude Desktop** (`~/Library/Application Support/Claude/claude_desktop_config.json` on macOS or `%APPDATA%\Claude\claude_desktop_config.json` on Windows):
-
-```json
-{
-  "mcpServers": {
-    "claude-onedrive-memory": {
-      "command": "npx",
-      "args": ["@patrick-rodgers/claude-onedrive-memory"]
-    }
-  }
-}
-```
-
-**Claude Code CLI** (`~/.claude/mcp-servers.json`):
-
-```json
-{
-  "mcpServers": {
-    "claude-onedrive-memory": {
-      "command": "npx",
-      "args": ["@patrick-rodgers/claude-onedrive-memory"]
-    }
-  }
-}
-```
-
-**Local Development:**
-
-```json
-{
-  "mcpServers": {
-    "claude-onedrive-memory": {
-      "command": "node",
-      "args": ["/path/to/claude-onedrive-memory/dist/mcp-server.js"]
-    }
-  }
-}
-```
-
-Restart Claude, and the memory tools will be automatically available!
 
 ## 📚 How It Works
 
@@ -142,6 +115,23 @@ Browse memories as resources:
 - `memory://{id}` - Specific memory as Markdown
 - `memory://project/{project-id}` - Memories for a specific project
 - `memory://category/{category}` - Memories by category
+
+## 🎨 Claude Code Plugin Features
+
+When used with Claude Code, this plugin includes additional features:
+
+### 🪝 Automatic Session Hooks
+- **Session Start** - Automatically recalls project context when you start a new session
+- No need to manually ask Claude to remember—it happens automatically
+
+### ⌨️ Slash Commands
+- `/remember` - Quick memory creation
+- `/recall` - Search memories
+- `/memory-status` - Check system status
+
+### 📖 Skills
+- Rich documentation and guidance available via skills system
+- Type `/memory` to access memory skill documentation
 
 ## 💡 Usage Examples
 
@@ -257,7 +247,11 @@ Claude should **proactively remember** when discovering:
 
 ### Session Start Routine
 
-At the beginning of a session, Claude should:
+**With Claude Code (automatic):**
+The plugin's session hook automatically recalls project context when you start a new session. No manual action needed!
+
+**With Claude Desktop (manual):**
+At the beginning of a session, you can ask Claude to:
 1. Call `get_context` to get smart project-relevant memories
 2. Call `recall` with `category: "preference"` to get user preferences
 3. Call `recall` with `category: "task"` to check for ongoing work
