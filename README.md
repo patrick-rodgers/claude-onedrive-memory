@@ -8,7 +8,23 @@
 
 ## 🚀 Installation
 
-**Add one line to your MCP configuration and restart Claude:**
+### Claude Code (Recommended)
+
+**One command to install:**
+
+```bash
+claude plugin add @patrick-rodgers/claude-onedrive-memory
+```
+
+**That's it!** The plugin installs automatically with:
+- ✅ Session hooks (auto-recalls context on startup)
+- ✅ Slash commands (`/remember`, `/recall`, `/memory-status`)
+- ✅ All 17 memory tools
+- ✅ No configuration needed
+
+### Claude Desktop
+
+**Add to your MCP configuration:**
 
 ```json
 {
@@ -21,11 +37,11 @@
 }
 ```
 
-**Configuration file locations:**
-- **Claude Desktop**: `~/Library/Application Support/Claude/claude_desktop_config.json` (macOS) or `%APPDATA%\Claude\claude_desktop_config.json` (Windows)
-- **Claude Code**: `~/.claude/mcp-servers.json`
+**Config file location:**
+- macOS: `~/Library/Application Support/Claude/claude_desktop_config.json`
+- Windows: `%APPDATA%\Claude\claude_desktop_config.json`
 
-**That's it!** After restarting Claude, the memory tools will be automatically available. No API keys, no authentication, no setup required.
+Restart Claude Desktop after adding the configuration.
 
 ### Prerequisites
 
