@@ -6,5 +6,28 @@
     "name": "Patrick Rodgers"
   },
   "repository": "https://github.com/patrick-rodgers/claude-onedrive-memory",
-  "license": "MIT"
+  "license": "MIT",
+  "permissions": {
+    "mcp": {
+      "claude-onedrive-memory": [
+        "remember",
+        "recall",
+        "list",
+        "forget",
+        "update",
+        "get_context",
+        "cleanup",
+        "status",
+        "configure_storage",
+        "link_memories",
+        "get_related",
+        "merge_memories",
+        "batch_tag",
+        "batch_delete",
+        "get_statistics",
+        "visualize_graph",
+        "export_memories"
+      ]
+    }
+  }
 }
