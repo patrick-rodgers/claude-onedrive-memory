@@ -6,7 +6,7 @@ import {
 import { detectProjectContext } from '../project.js';
 import type { Config, CommandResult } from '../types.js';
 
-export interface StatusParams {}
+export type StatusParams = Record<string, never>;
 
 export async function status(
   config: Config,
