@@ -1,11 +1,11 @@
 #!/usr/bin/env node
 /**
- * Release script for odsp-memory-skill
+ * Release script for claude-onedrive-memory
  * Usage:
- *   npm run release patch          # 0.0.1 -> 0.0.2
- *   npm run release minor          # 0.0.1 -> 0.1.0
- *   npm run release major          # 0.0.1 -> 1.0.0
- *   npm run release 0.0.1          # Set specific version
+ *   npm run release patch          # 0.2.0 -> 0.2.1
+ *   npm run release minor          # 0.2.0 -> 0.3.0
+ *   npm run release major          # 0.2.0 -> 1.0.0
+ *   npm run release 0.3.0          # Set specific version
  *   npm run release patch --dry-run # Test locally without pushing
  */
 
@@ -119,11 +119,11 @@ async function main() {
     newVersion = arg;
   }
 
-  console.log(`\n📦 Releasing odsp-memory-skill ${DRY_RUN ? '(DRY RUN)' : ''}`);
+  console.log(`\n📦 Releasing claude-onedrive-memory ${DRY_RUN ? '(DRY RUN)' : ''}`);
   console.log(`   Current version: ${currentVersion}`);
   console.log(`   New version:     ${newVersion}`);
   if (DRY_RUN) {
-    console.log(`   Mode:            🧪 Dry run (no git push or GitHub release)`);
+    console.log(`   Mode:            🧪 Dry run (no git push or npm publish)`);
   }
   console.log('');
 
@@ -135,9 +135,9 @@ async function main() {
   console.log('\n2️⃣  Building...');
   execSync('npm run build', { stdio: 'inherit', cwd: ROOT_DIR });
 
-  // Step 3: Package for distribution
-  console.log('\n3️⃣  Creating distribution package...');
-  execSync('npm run package', { stdio: 'inherit', cwd: ROOT_DIR });
+  // Step 3: Create tarball
+  console.log('\n3️⃣  Creating npm package...');
+  execSync('npm pack', { stdio: 'inherit', cwd: ROOT_DIR });
 
   if (DRY_RUN) {
     // In dry-run mode, restore the original version
@@ -149,12 +149,13 @@ async function main() {
     console.log(`   ✓ Version bump works: ${currentVersion} → ${newVersion}`);
     console.log(`   ✓ Build successful`);
     console.log(`   ✓ Package creation successful`);
-    console.log(`   ✓ Distribution files ready in teams-distribution/`);
+    console.log(`   ✓ Package tarball: patrick-rodgers-claude-onedrive-memory-${newVersion}.tgz`);
     console.log('\nSkipped in dry-run mode:');
     console.log('   - Git commit');
     console.log('   - Git tag creation');
     console.log('   - Push to remote');
     console.log('   - GitHub release creation');
+    console.log('   - npm publish');
     console.log('\nTo perform a real release, run without --dry-run flag.');
     return;
   }
@@ -174,6 +175,7 @@ async function main() {
   console.log('\n6️⃣  Creating GitHub release...');
   const releaseNotes = getReleaseNotes(currentVersion, newVersion);
   const notesFile = join(ROOT_DIR, '.release-notes.tmp');
+  const tarballName = `patrick-rodgers-claude-onedrive-memory-${newVersion}.tgz`;
   writeFileSync(notesFile, releaseNotes);
 
   try {
@@ -181,7 +183,7 @@ async function main() {
       `gh release create v${newVersion} ` +
       `--title "v${newVersion}" ` +
       `--notes-file "${notesFile}" ` +
-      `teams-distribution/odsp-memory-skill-${newVersion}.tgz`
+      `${tarballName}`
     );
   } finally {
     // Clean up temp file
@@ -192,9 +194,14 @@ async function main() {
     }
   }
 
+  // Step 7: Publish to npm
+  console.log('\n7️⃣  Publishing to npm...');
+  exec('npm publish --access public');
+
   console.log('\n✅ Release complete!');
   console.log(`\n🎉 Version ${newVersion} has been released`);
-  console.log(`   View release: https://github.com/$(git config --get remote.origin.url | sed 's/.*://;s/.git$//')/releases/tag/v${newVersion}`);
+  console.log(`   View release: https://github.com/patrick-rodgers/claude-onedrive-memory/releases/tag/v${newVersion}`);
+  console.log(`   npm package: https://www.npmjs.com/package/@patrick-rodgers/claude-onedrive-memory/v/${newVersion}`);
 }
 
 main().catch((error) => {

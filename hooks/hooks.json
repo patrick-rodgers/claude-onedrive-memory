@@ -2,8 +2,7 @@
   "SessionStart": [
     {
       "type": "command",
-      "command": "bash",
-      "args": ["hooks/session-start.sh"],
+      "command": "${CLAUDE_PLUGIN_ROOT}/hooks/session-start.sh",
       "description": "Auto-recall project context at session start"
     }
   ]

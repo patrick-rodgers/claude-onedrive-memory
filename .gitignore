@@ -4,5 +4,4 @@ dist/
 *.log
 .DS_Store
 *.tgz
-teams-distribution/
-.claude/
+.claude/settings.local.json
