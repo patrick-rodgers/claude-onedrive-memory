@@ -3,11 +3,5 @@ tsconfig.json
 .gitignore
 *.log
 scripts/
-install.sh
-install.ps1
-DISTRIBUTION.md
-INSTALLATION_NOTES.md
-MCP_SKILL_DISTRIBUTION.md
-mcp-setup-skill.md
 CHANGELOG.md
-teams-distribution/
+.claude/
