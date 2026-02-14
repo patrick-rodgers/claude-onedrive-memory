@@ -48,6 +48,30 @@ Restart Claude Desktop after adding the configuration.
 - **Node.js 18+** ([Download](https://nodejs.org/))
 - **OneDrive** (optional) - For automatic sync across devices. If not installed, you can configure a custom storage location using the `configure_storage` tool.
 
+### Optional Configuration
+
+#### 1. Auto-Approve Tool Calls (No Prompts)
+
+The plugin automatically requests permissions for all its tools. When installed, Claude Code will ask once to approve access, then all memory operations will work without additional prompts.
+
+#### 2. Make This Your Default Memory System
+
+To replace Claude's built-in memory globally, add to `~/.claude/CLAUDE.md`:
+
+```markdown
+## Memory System
+
+ALWAYS use the OneDrive Memory MCP tools for ALL memory operations:
+- remember - Store information
+- recall - Search memories
+- get_context - Get project context
+- list, forget, update - Manage memories
+
+Do NOT use any other memory system. This is my preferred memory implementation.
+```
+
+This tells Claude to route all memory operations through this plugin.
+
 ## ✨ Features
 
 - **🧠 17 Memory Tools** - Complete toolkit for storing, searching, linking, and managing memories
