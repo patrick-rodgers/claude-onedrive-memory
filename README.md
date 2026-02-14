@@ -8,7 +8,7 @@
 
 ## ✨ Features
 
-- **🧠 16 Memory Tools** - Complete toolkit for storing, searching, linking, and managing memories
+- **🧠 17 Memory Tools** - Complete toolkit for storing, searching, linking, and managing memories
 - **📦 MCP Resources** - Browse memories as resources (`memory://list`, `memory://{id}`, etc.)
 - **🎯 Smart Context** - Automatically detects project patterns and recalls relevant memories
 - **🔗 Memory Relationships** - Link related memories and visualize connections
@@ -121,7 +121,7 @@ Memories are automatically scoped to your current git repository. When you store
 | `status` | Check OneDrive detection and system status |
 | `configure_storage` | Select OneDrive folder or set custom storage location |
 
-### Advanced Operations (7 tools)
+### Advanced Operations (8 tools)
 
 | Tool | Description |
 |------|-------------|
