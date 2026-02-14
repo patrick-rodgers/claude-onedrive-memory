@@ -176,13 +176,18 @@ Browse memories via URI:
 
 ## Session Start Routine
 
-At the beginning of each session, I should:
+**Automatic Behavior:**
+When installed as a plugin, the SessionStart hook automatically triggers me to:
+1. **Call `get_context`** (limit: 5, verbose: false) to load project-relevant memories
+2. **Summarize the recalled context** briefly for the user
+3. **Display available commands** (/remember, /recall, /memory-status)
 
-1. **Call `get_context`** to load project-relevant memories
-2. **Call `recall` with `category: "preference"`** to get user preferences
-3. **Call `recall` with `category: "task"`** to check ongoing work
+**Additional Context (if needed):**
+After the automatic context load, I may also:
+- **Call `recall` with `category: "preference"`** to get user preferences
+- **Call `recall` with `category: "task"`** to check ongoing work
 
-This ensures continuity across sessions and awareness of project context.
+This ensures continuity across sessions and immediate awareness of project context.
 
 ## Storage
 

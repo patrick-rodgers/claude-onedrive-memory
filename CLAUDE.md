@@ -170,6 +170,15 @@ This project is a Claude Code plugin (installed via `claude plugin add`):
 - **`commands/`** - Slash commands (e.g., `/remember`, `/recall`)
 - **`hooks/`** - Event hooks (e.g., SessionStart for auto-context)
 
+### SessionStart Hook Behavior
+
+When a new session starts, the `hooks/session-start.sh` hook executes and outputs instructions for Claude to:
+1. **Proactively call `get_context` tool** with `limit: 5` and `verbose: false`
+2. **Summarize recalled context** briefly for the user
+3. **Display available commands** (/remember, /recall, /memory-status)
+
+This ensures continuity across sessions by automatically loading project-relevant memories.
+
 ## Memory Categories
 
 - **`project`** - Codebase structure, architecture, key files
