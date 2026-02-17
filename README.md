@@ -13,14 +13,10 @@
 **One command to install:**
 
 ```bash
-claude plugin add @patrick-rodgers/claude-onedrive-memory
+claude mcp add claude-onedrive-memory -- npx @patrick-rodgers/claude-onedrive-memory
 ```
 
-**That's it!** The plugin installs automatically with:
-- ✅ Session hooks (auto-recalls context on startup)
-- ✅ Slash commands (`/remember`, `/recall`, `/memory-status`)
-- ✅ All 17 memory tools
-- ✅ No configuration needed
+This registers the MCP server with Claude Code. All 17 memory tools will be available in your next session.
 
 ### Claude Desktop
 
